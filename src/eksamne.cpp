@@ -1,10 +1,14 @@
 #include <Arduino.h>
 
 struct player{
-  char name[10];
-  int[5] reactionTimes;
-  int averageReactionTimes;
-}
+  char name[10] = "player";
+  int *reactionTimes;
+  int *averageReactionTimes;
+};
+
+const int numbersOfPlayer = 5;
+struct player *playerArray[numbersOfPlayer];
+
 
 const int butUp = 3;
 const int butDown = 4;
@@ -43,8 +47,21 @@ void singleplayer(){
   delay(500);
 }
 
+void definePlayerArray(player *playerArray) {
+  for(int i = 0; i != numbersOfPlayer; i++){
+    *playerArray[i].name = (char*)"l";
+  }
+}
+
+void printPlayers(player playerArray[]) {
+  for(int i = 0; i != numbersOfPlayer; i++){
+    Serial.println(*playerArray[i].name);
+  }
+}
+
 void Multiplayer() {
-  /* code */
+  //definePlayerArray(*playerArray);
+  printPlayers(*playerArray);
 }
 
 void printMenu(int menuID){
