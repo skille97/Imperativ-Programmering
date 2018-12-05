@@ -1,13 +1,13 @@
 #include <Arduino.h>
 
 struct player{
-  char name[10] = "player";
-  int *reactionTimes;
-  int *averageReactionTimes;
+  char name[10];
+  int reactionTimes[5];
+  int averageReactionTimes;
 };
 
 const int numbersOfPlayer = 5;
-struct player *playerArray[numbersOfPlayer];
+struct player playerArray[numbersOfPlayer];
 
 
 const int butUp = 3;
@@ -32,6 +32,7 @@ int measuresReactionTime(){
   startTime = millis();
   waitUntilKeyPressed();
   stopTime = millis();
+  Serial.println(stopTime - startTime);
   return stopTime - startTime;
 }
 
@@ -47,21 +48,28 @@ void singleplayer(){
   delay(500);
 }
 
-void definePlayerArray(player *playerArray) {
+void definePlayerArray(player playerArray[]) {
   for(int i = 0; i != numbersOfPlayer; i++){
-    *playerArray[i].name = (char*)"l";
+    sprintf(playerArray[i].name, "player %d", i);
   }
 }
 
 void printPlayers(player playerArray[]) {
   for(int i = 0; i != numbersOfPlayer; i++){
-    Serial.println(*playerArray[i].name);
+    Serial.println(playerArray[i].name);
+  }
+}
+
+void ReactionTimeMultiplayer(struct player *player){
+  for(int i = 0; i != 5; i++){
+    player->reactionTimes[i] = measuresReactionTime();
   }
 }
 
 void Multiplayer() {
-  //definePlayerArray(*playerArray);
-  printPlayers(*playerArray);
+  definePlayerArray(playerArray);
+  ReactionTimeMultiplayer(&playerArray[0]);
+  printPlayers(playerArray);
 }
 
 void printMenu(int menuID){
