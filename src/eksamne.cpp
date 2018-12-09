@@ -14,7 +14,7 @@ const int butUp = 3;
 const int butDown = 4;
 
 int menuID = 1;
-int lastMenuID;
+int lastMenuID = 0;
 
 void waitRandomTime(){
   delay(random(500, 2000));
@@ -32,7 +32,6 @@ int measuresReactionTime(){
   startTime = millis();
   waitUntilKeyPressed();
   stopTime = millis();
-  Serial.println(stopTime - startTime);
   return stopTime - startTime;
 }
 
@@ -56,20 +55,54 @@ void definePlayerArray(player playerArray[]) {
 
 void printPlayers(player playerArray[]) {
   for(int i = 0; i != numbersOfPlayer; i++){
-    Serial.println(playerArray[i].name);
+    Serial.print(playerArray[i].name);
+    Serial.print(" average reaction times is ");
+    Serial.println(playerArray[i].averageReactionTimes);
   }
 }
 
-void ReactionTimeMultiplayer(struct player *player){
+void ReactionTimeMultipleTimes(struct player *player){
   for(int i = 0; i != 5; i++){
+    Serial.print("Test ");
+    Serial.println(i + 1);
     player->reactionTimes[i] = measuresReactionTime();
   }
 }
 
-void Multiplayer() {
+void calculateaverage(player playerArray[]){
+  for(int i = 0; i != numbersOfPlayer; i++){
+    int sum = 0;
+    for(int j = 0; j != 5; j++){
+      sum += playerArray[i].reactionTimes[j];
+    }
+    playerArray[i].averageReactionTimes = sum/5;
+  }
+}
+
+void multiplayer() {
+  Serial.println();
+  Serial.println("you have selected multiplayer");
   definePlayerArray(playerArray);
-  ReactionTimeMultiplayer(&playerArray[0]);
+  for(int i = 0; i != 5; i++){
+    delay(500);
+    Serial.print("it is ");
+    Serial.print(playerArray[i].name);
+    Serial.println(" turn.");
+    Serial.println("Press go to start");
+    waitUntilKeyPressed();
+    ReactionTimeMultipleTimes(&playerArray[i]);
+  }
+  Serial.println("all the Test are done");
+  calculateaverage(playerArray);
+  delay(500);
+}
+
+void scores(){
   printPlayers(playerArray);
+}
+
+void reset() {
+  memset(playerArray, 0, sizeof(playerArray));
 }
 
 void printMenu(int menuID){
@@ -77,25 +110,37 @@ void printMenu(int menuID){
   switch(menuID){
     case 1:
       if(menuID != lastMenuID){
-        Serial.println("Single player");
+        Serial.println(">Single player");
       }
       if(!digitalRead(2)){
         singleplayer();
       }
       break;
+
     case 2:
       if(menuID != lastMenuID){
-        Serial.println("Multiplayer");
+        Serial.println(">Multiplayer");
       }
       if(!digitalRead(2)){
-        Multiplayer();
+        multiplayer();
       }
       break;
+
     case 3:
       if(menuID != lastMenuID){
-        Serial.println("Scores");
+        Serial.println(">Scores");
       }
       if(!digitalRead(2)){
+        scores();
+      }
+      break;
+
+    case 4:
+      if(menuID != lastMenuID){
+        Serial.println(">reset Scores");
+        }
+      if(!digitalRead(2)){
+        reset();
       }
       break;
   }
@@ -105,15 +150,15 @@ void printMenu(int menuID){
 void menu(){
   if(!digitalRead(butDown)){
     if(menuID <= 1){
-      menuID = 1;
+      menuID = 4;
     }
     else {
       menuID--;
     }
   }
   if(!digitalRead(butUp)){
-    if(menuID >= 3){
-      menuID = 3;
+    if(menuID >= 4){
+      menuID = 1;
     }
     else{
       menuID++;
@@ -133,6 +178,7 @@ void setup() {
   pinMode(13, OUTPUT);
 
   Serial.begin(9600);
+  Serial.println("welcome");
 
 }
 
