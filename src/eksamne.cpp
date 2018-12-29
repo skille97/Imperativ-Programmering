@@ -8,13 +8,16 @@ Der er implementeret et menu system, hvor man kan måle reaktionstid på en spil
 
 #include <Arduino.h>
 
+const int numbersOfPlayer = 3;
+const int numbersOfTest = 3;
+
 struct player{
   char name[10];
-  int reactionTimes[5];
+  int reactionTimes[numbersOfTest];
   int averageReactionTimes;
 };
 
-const int numbersOfPlayer = 5;
+
 struct player playerArray[numbersOfPlayer];
 
 
@@ -83,7 +86,7 @@ void printPlayers(player playerArray[]) {
 
 void ReactionTimeMultipleTimes(struct player *player){
   // Measure reaction time 5 times
-  for(int i = 0; i < 5; i++){
+  for(int i = 0; i < numbersOfTest; i++){
     Serial.print("Test ");
     Serial.println(i + 1);
     player->reactionTimes[i] = measuresReactionTime();
@@ -94,15 +97,15 @@ void calculateaverage(player playerArray[]){
   // Calculate average reaction time for all players
   for(int i = 0; i < numbersOfPlayer; i++){
     int sum = 0;
-    for(int j = 0; j < 5; j++){
+    for(int j = 0; j < numbersOfTest; j++){
       sum += playerArray[i].reactionTimes[j];
     }
-    playerArray[i].averageReactionTimes = sum/5;
+    playerArray[i].averageReactionTimes = sum/numbersOfTest;
   }
 }
 
 void multiplayer() {
-  // Measure reaction time for 5 players
+  // Measure reaction time for the players
   Serial.println();
   Serial.println("you have selected multiplayer");
   definePlayerArray(playerArray);
@@ -115,19 +118,24 @@ void multiplayer() {
     waitUntilKeyPressed();
     ReactionTimeMultipleTimes(&playerArray[i]);
   }
-  Serial.println("all the test are done");
+  Serial.println("All the test are done");
   calculateaverage(playerArray);
   delay(500);
 }
 
 void scores(){
   // Prints out reaction time for all players
+  if(playerArray[0].averageReactionTimes == 0){
+    Serial.println("no scores to show");
+    return;
+  }
   printPlayers(playerArray);
 }
 
 void reset() {
   // Empties PlayerArray filling it with Null
   memset(playerArray, 0, sizeof(playerArray));
+  Serial.println("The scores have been reset");
 }
 
 void printMenu(int menuID){
